@@ -2,6 +2,7 @@ import cors from 'cors';
 import express from 'express';
 import { connectToDB,db } from "./db.js";
 
+
 const app = express()
 app.use(cors())
 app.use(express.json())
@@ -37,26 +38,39 @@ app.post('/insertmany', async(req, res) => {
     .catch((e)=>console.log(e))
 })
 
-app.post('/forgetpassword', async(req, res) => {
-    await db.collection("login").findOne({Email:req.body.email})
+// app.post('/forgetpassword', async(req, res) => {
+//     await db.collection("login").updateOne({Email:req.body.email},{$set:{password:req.body.password}})
+//     .then((result)=>{
+//         if(result)
+//         res.json({message:"change password",values:result})
+        
+//     })
+//     .catch((e)=>console.log(e))
+// })
+// app.post('/forgetpassword', async(req, res) => {
+//     await db.collection("login").updateOne({Password:req.body.password})
+//     .then((result)=>{
+        
+//         res.json({message:"password changed",values:result})
+        
+//     })
+//     .catch((e)=>console.log(e))
+// })
+
+app.post('/forgotpassword', async(req, res) => {
+    await db.collection("ast").updateOne({Email:req.body.email},{$set:{Password:req.body.password}})
     .then((result)=>{
-        
-        res.json({message:"change password",values:result})
-        
+        if(result?.Email===req.body.Email){
+        if(result?.Password===req.body.password){
+            res.json({message:"password used change it",values:result})
+            }else{
+                res.json({message:"successfully changed"})
+    
+            }
+        }
     })
     .catch((e)=>console.log(e))
 })
-app.post('/forgetpassword', async(req, res) => {
-    await db.collection("login").updateOne({Password:req.body.password})
-    .then((result)=>{
-        
-        res.json({message:"password changed",values:result})
-        
-    })
-    .catch((e)=>console.log(e))
-})
-
-
 
 app.post('/signIn', async(req, res) => {
     
@@ -86,6 +100,8 @@ app.post('/students', async(req, res) => {
             res.json({error:"failed to  signout"})
         }
       })
+
+      
 
     connectToDB(() => {
         app.listen(9000, () => {
